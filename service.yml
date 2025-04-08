@@ -1,0 +1,9 @@
+name: atg_cc_enterprise_via_nlb
+lang: unknown
+lang_version: unknown
+git:
+  enable: true
+codeowners:
+  enable: true
+renovatebot:
+  enable: false
