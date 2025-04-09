@@ -23,7 +23,7 @@ data "aws_ami" "amzn-linux-2023-ami" {
 }
 resource "aws_key_pair" "jumphost_kp" {
     key_name = "jumphost_kp"
-    public_key = file("./jump-host/jumphost_kp.pub")
+    public_key = file("./aws/jump-host/jumphost_kp.pub")
 }
 resource "aws_security_group" "publicssh" {
   # Ensure that SG is unique, so that this module can be used multiple times within a single VPC
