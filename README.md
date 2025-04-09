@@ -3,7 +3,29 @@
 
 Uses a NLB on AWS to expose a Confluent Cloud Enterprise cluster with a public endpoint
 
-NB! this is just a proof-of-concept, so it only uses a single AZ with a single Private Link endpoint. This is a single point of failure. For production use it would need to be extended to use at least 2 of the possible 3 endpoints to connect to the Confluent Cloud Network.
+### Prerequisites
+
+1. AWS client configured so that the *hashicorp/aws* provider can create resources in your AWS account.
+2. A Confluent Cloud API key in order to create resources in your CC Organization.
+3. The `netcat/nc` tool installed and on your path in order to test network connectivity to CC
+4. Confluent CLI installed (optional)
+
+### What does this Terraform setup do?
+
+1. Creates an Enterprise cluster in Confluent Cloud. This cluster can only be accessed via a private network connection.
+2. Creates a VPC in your account containing two subnets one *public*, the other *private*
+3. Creates a Private Link endpoint for the Confluent Cloud Network and places in the *private* subnet
+4. Creates a Network Load Balancer,assigns it a public IP address and attaches it to the *public* subnet
+5. Sets the PL endpoint as the target for the NLB
+
+Thus we end up with an NLB on the public internet which forwards traffic (on ports 443 (REST) and 9092 (Kafka)) to the PL endpoint which gives access to the Enterprise Cluster. In order for this to be useful it requires some DNS changes.
+
+Any clients accessing the public endpoint need to resolve both the bootstrap FQDN (which has the form `<lkc_id>.<region>.<csp>.private.confluent.cloud`) and all the broker FQDNs (of the form <lkc_id>_<broker_hex>.<region>.<csp>.private.confluent.cloud`)) to the public IP address of the NLB. This requires a wildcard mapping in the DNS, which can be accomplished in dnsmasq with an entry like
+```
+address=/eu-west-1.aws.private.confluent.cloud/34.242.88.53
+```
+
+NB! this is just a proof-of-concept, so it only uses a single AZ with a single Private Link endpoint. This is a single point of failure. For production use it would need to be extended to use at least 2 of the possible 3 PL endpoints to connect to the Confluent Cloud Network that the cluster is in.
 
 ### Notes
 
