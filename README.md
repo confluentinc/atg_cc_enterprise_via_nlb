@@ -1,10 +1,5 @@
 # atg_cc_enterprise_via_nlb
 
-This repository is part of the Confluent organization on GitHub.
-It is public and open to contributions from the community.
-
-Please see the LICENSE file for contribution terms.
-Please see the CHANGELOG.md for details of recent updates.
 
 Use a NLB on AWS to expose a Confluent Cloud cluster with a public endpoint
 
@@ -37,4 +32,13 @@ terraform output connection_info
 ```
 
 If you can add an entry in your local /etc/hosts file (or DNS) so that the FQDN of the cluster endpoint public IP address then when you re-run `terraform apply` the API key generation should succeed.
+
+----
+
+This repository is part of the Confluent organization on GitHub.
+It is public and open to contributions from the community.
+
+Please see the LICENSE file for contribution terms.
+Please see the CHANGELOG.md for details of recent updates.
+
 
