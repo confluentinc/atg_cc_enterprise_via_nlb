@@ -56,21 +56,27 @@ module "cc_controlplane" {
   owner                    = var.owner 
   env_prefix               = var.env_prefix
 }
-output "connection_info" {
+output "endpoint_info" {
   value = <<-EOT
   In order to be able to access the dataplane you need to add
   an entry to your local /etc/hosts file to map
   Public IP address of cluster:   ${module.awsvpcs.loadbalancer_ip.public_ip}
   FQDN of cluster: ${split(":", module.cc_controlplane.enterprise_cluster.bootstrap_endpoint)[0]}
 
-  ${module.cc_dataplane.resource-ids}
   EOT
 
   sensitive = true
 }
 
+data "external" "check_dataplane_access" {
+  program     = ["/bin/bash", "-c", "${path.module}/check_dataplane.sh", "${module.cc_controlplane.enterprise_cluster.bootstrap_endpoint}", "9092"]
+}
+
 module "cc_dataplane" {
   source                   = "./cc-dataplane"
+
+  # Don't attempt any DataPlane API calls if we can't access it yet
+  count                    = data.external.check_dataplane_access.result.is_connected == "true" ? 1 : 0
 
   confluent_cloud_api_key  = var.confluent_cloud_api_key
   confluent_cloud_api_secret = var.confluent_cloud_api_secret
@@ -86,5 +92,17 @@ module "cc_dataplane" {
   env_prefix               = var.env_prefix
 }
 
+output "connection_info" {
+  value = [
+    for v in module.cc_dataplane: v.resource-ids
+  ]
+  /*
+  value = <<-EOT
+  ${module.cc_dataplane[*].resource-ids}
+  EOT
+  */
+
+  sensitive = true
+}
 
 
