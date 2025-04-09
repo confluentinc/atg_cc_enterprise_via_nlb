@@ -1,6 +1,7 @@
 variable "region" {
   description = "The AWS region in which to create the VPCs and CC cluster"
   type        = string
+  default     = "eu-west-1"
 }
 variable "owner" {
   description = "The email address of the person creating the resources"

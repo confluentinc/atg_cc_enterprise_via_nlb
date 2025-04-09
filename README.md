@@ -18,8 +18,8 @@ This set-up uses the `CONFLUENT_CLOUD_API_KEY` and `CONFLUENT_CLOUD_API_SECRET` 
 ```
 export CONFLUENT_CLOUD_API_KEY="<cloud_api_key>"
 export CONFLUENT_CLOUD_API_SECRET="<cloud_api_secret>"
-export TF_VAR_owner=
-export TF_VAR_region=
+export TF_VAR_owner=<email address to tag AWS resources>
+export TF_VAR_region=<AWS region to use, defaults to eu-west-1/Ireland>
 ```
 
 Run this by carrying out
@@ -36,9 +36,9 @@ At this stage the public IP address should have been set up, so you can access i
 terraform output endpoint_info
 ```
 
-If you can add an entry in your local /etc/hosts file (or DNS) so that the FQDN of the cluster endpoint public IP address then when you re-run `terraform apply` the API key generation should succeed and the topic will be created.
+If you can add an entry in your local `/etc/hosts` file (or DNS) so that the FQDN of the cluster endpoint points to the public IP address then when you re-run `terraform apply` the API key generation should succeed and the topic will be created.
 
-In order to be able to access the Kafka APIs your DNS should resolve the wildcard `*.<region>.aws.private.confluent.cloud` to the public IP address of the NLB. Look at the `connection_info` output from Terraform to retrieve the newly create cluster API keys and some example commands for producing to and consuming from the topic using the [Confluent CLI tool](https://docs.confluent.io/confluent-cli/current/install.html).
+In order to be able to access the Kafka APIs (i.e. using a Kafka client) your DNS should resolve the wildcard `*.<region>.aws.private.confluent.cloud` to the public IP address of the NLB. Look at the `connection_info` output from Terraform to retrieve the newly create cluster API keys and some example commands for producing to and consuming from the topic using the [Confluent CLI tool](https://docs.confluent.io/confluent-cli/current/install.html).
 
 ```
 terraform output connection_info
