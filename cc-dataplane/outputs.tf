@@ -1,8 +1,4 @@
 output "resource-ids" {
-  value = ""
-}
-/*
-output "resource-ids" {
   value = <<-EOT
   
   Kafka topic name: ${confluent_kafka_topic.orders.topic_name}
@@ -41,4 +37,3 @@ output "resource-ids" {
   # When you are done, press 'Ctrl-C'.
   EOT
 }
-*/

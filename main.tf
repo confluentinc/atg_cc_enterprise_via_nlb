@@ -49,8 +49,6 @@ module "cc_controlplane" {
   source                   = "./cc-controlplane"
   vpc_id                   = module.awsvpcs.vpc_id
 
-  confluent_cloud_api_key  = var.confluent_cloud_api_key
-  confluent_cloud_api_secret = var.confluent_cloud_api_secret
   region                    = var.region
   vpc_endpoint_id          = module.privatelink.vpc_endpoint_id
   owner                    = var.owner 
@@ -69,7 +67,7 @@ output "endpoint_info" {
 }
 
 data "external" "check_dataplane_access" {
-  program     = ["/bin/bash", "-c", "${path.module}/check_dataplane.sh", "${module.cc_controlplane.enterprise_cluster.bootstrap_endpoint}", "9092"]
+  program     = ["/bin/bash", "-c", "${path.module}/check_dataplane.sh ${split(":", module.cc_controlplane.enterprise_cluster.bootstrap_endpoint)[0]} 9092"]
 }
 
 module "cc_dataplane" {
@@ -77,9 +75,6 @@ module "cc_dataplane" {
 
   # Don't attempt any DataPlane API calls if we can't access it yet
   count                    = data.external.check_dataplane_access.result.is_connected == "true" ? 1 : 0
-
-  confluent_cloud_api_key  = var.confluent_cloud_api_key
-  confluent_cloud_api_secret = var.confluent_cloud_api_secret
 
   app-manager-sa           = module.cc_controlplane.app-manager
   app-consumer-sa          = module.cc_controlplane.app-consumer
@@ -94,7 +89,7 @@ module "cc_dataplane" {
 
 output "connection_info" {
   value = [
-    for v in module.cc_dataplane: v.resource-ids
+    for v in module.cc_dataplane: "${v.resource-ids}"
   ]
   /*
   value = <<-EOT

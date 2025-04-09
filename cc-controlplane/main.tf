@@ -10,12 +10,6 @@ resource "random_id" "env_display_id" {
     byte_length = 4
 }
 
-provider "confluent" {
-  cloud_api_key    = var.confluent_cloud_api_key
-  cloud_api_secret = var.confluent_cloud_api_secret
-}
-
-
 resource "confluent_environment" "pe_staging" {
   display_name = "${var.env_prefix}-environment-${random_id.env_display_id.hex}"
 }

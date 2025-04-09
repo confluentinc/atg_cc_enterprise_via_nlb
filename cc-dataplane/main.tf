@@ -3,13 +3,14 @@ terraform {
     confluent = {
       source  = "confluentinc/confluent"
       version = ">=2.20.0"
+      //configuration_aliases = [confluent.cc-credentials]
     }
   }
 }
 
 resource "confluent_api_key" "app-manager-kafka-api-key" {
   display_name = "app-manager-kafka-api-key"
-  description  = "Kafka API Key that is owned by 'app-manager' service account"
+  description  = "Kafka API Key that is owned by '${var.app-manager-sa.display_name}' service account"
   owner {
     id          = var.app-manager-sa.id
     api_version = var.app-manager-sa.api_version
