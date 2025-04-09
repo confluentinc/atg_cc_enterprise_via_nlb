@@ -18,14 +18,14 @@ provider "aws" {
 }
 
 module "awsvpcs" {
-  source        = "./aws-vpcs"
+  source        = "./aws/vpcs"
   region        = var.region
   owner         = var.owner
   pl_endpoints  = [module.privatelink.vpc_endpoint]
   env_prefix    = var.env_prefix
 }
 module "jumphost" {
-  source                = "./jump-host"
+  source                = "./aws/jump-host"
   region                = var.region
   subnet_id             = module.awsvpcs.public_subnet_id
   vpc_id                = module.awsvpcs.vpc_id
@@ -34,7 +34,7 @@ module "jumphost" {
 }
 
 module "privatelink" {
-  source                   = "./aws-privatelink-endpoint"
+  source                   = "./aws/privatelink-endpoint"
   vpc_id                   = module.awsvpcs.vpc_id
   privatelink_service_name = module.cc_controlplane.vpc_endpoint_service_name
   dns_domain               = module.cc_controlplane.dns_domain
@@ -46,7 +46,7 @@ module "privatelink" {
 }
 
 module "cc_controlplane" {
-  source                   = "./cc_controlplane"
+  source                   = "./cc-controlplane"
   vpc_id                   = module.awsvpcs.vpc_id
 
   confluent_cloud_api_key  = var.confluent_cloud_api_key
@@ -70,7 +70,7 @@ output "connection_info" {
 }
 
 module "cc_dataplane" {
-  source                   = "./cc_dataplane"
+  source                   = "./cc-dataplane"
 
   confluent_cloud_api_key  = var.confluent_cloud_api_key
   confluent_cloud_api_secret = var.confluent_cloud_api_secret
