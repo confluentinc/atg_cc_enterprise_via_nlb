@@ -114,18 +114,6 @@ resource "aws_internet_gateway" "ig" {
   }
 }
 
-/*
-# Elastic-IP (eip) for NAT
-resource "aws_eip" "nat_eip" {
-  domain        = "vpc"
-  tags = {
-    Name        = "${var.env_prefix}-nat-ip"
-    Environment = "${var.environment}"
-    Owner       = var.owner
-  }
-  depends_on = [aws_internet_gateway.ig]
-}*/
-
 # Routing tables to route traffic for Private Subnet
 resource "aws_route_table" "private" {
   vpc_id = aws_vpc.vpc.id
