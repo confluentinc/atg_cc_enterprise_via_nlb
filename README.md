@@ -1,9 +1,18 @@
 # atg_cc_enterprise_via_nlb
 
 
-Use a NLB on AWS to expose a Confluent Cloud cluster with a public endpoint
+Uses a NLB on AWS to expose a Confluent Cloud Enterprise cluster with a public endpoint
+
+NB! this is just a proof-of-concept, so it only uses a single AZ with a single Private Link endpoint. This is a single point of failure. For production use it would need to be extended to use at least 2 of the possible 3 endpoints to connect to the Confluent Cloud Network.
 
 ### Notes
+
+Before running Terraform, create a keypair for the jumphost
+```
+cd aws/jump-host
+ssh-keygen -t rsa -b 4096 -m pem -f jumphost_kp && openssl rsa -in jumphost_kp -outform pem && chmod 400 jumphost_kp
+cd ../..
+```
 
 This set-up uses the following variables
 ```
