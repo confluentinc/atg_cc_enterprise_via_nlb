@@ -1,0 +1,3 @@
+# Don't store the public and private key for the jump-host in git
+jumphost_kp
+jumphost_kp.pub
