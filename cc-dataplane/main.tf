@@ -35,7 +35,9 @@ resource "confluent_api_key" "app-manager-kafka-api-key" {
   # multiple copies of this definition in the configuration which would happen if we specify it in
   # confluent_kafka_topic, confluent_kafka_acl resources instead.
   depends_on = [
-    var.app-manager-is-cluster-admin, var.plac
+    var.app-manager-is-cluster-admin,
+    var.plac,
+    var.access_point
   ]
 }
 

@@ -23,3 +23,13 @@ variable "env_prefix" {
   type        = string
   default     = "e2"
 }
+
+variable "privatelink_mode" {
+  description = "PrivateLink mode: 'platt' for Private Link Attachment or 'gateway' for Gateway + Access Point"
+  type        = string
+  default     = "platt"
+  validation {
+    condition     = contains(["platt", "gateway"], var.privatelink_mode)
+    error_message = "privatelink_mode must be either 'platt' or 'gateway'."
+  }
+}

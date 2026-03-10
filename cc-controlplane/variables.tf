@@ -21,3 +21,9 @@ variable "env_prefix" {
   type        = string
 }
 
+variable "privatelink_mode" {
+  description = "PrivateLink mode: 'platt' for Private Link Attachment or 'gateway' for Gateway + Access Point"
+  type        = string
+  default     = "platt"
+}
+

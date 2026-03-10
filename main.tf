@@ -51,8 +51,9 @@ module "cc_controlplane" {
 
   region                    = var.region
   vpc_endpoint_id          = module.privatelink.vpc_endpoint_id
-  owner                    = var.owner 
+  owner                    = var.owner
   env_prefix               = var.env_prefix
+  privatelink_mode         = var.privatelink_mode
 }
 output "endpoint_info" {
   value = <<-EOT
@@ -81,9 +82,10 @@ module "cc_dataplane" {
   app-producer-sa          = module.cc_controlplane.app-producer
   kafka-cluster            = module.cc_controlplane.enterprise_cluster
   plac                     = module.cc_controlplane.plac
+  access_point             = module.cc_controlplane.access_point
   app-manager-is-cluster-admin = module.cc_controlplane.am-cluster-admin
   cc-environment           = module.cc_controlplane.cc_environment
-  //owner                    = var.owner 
+  //owner                    = var.owner
   env_prefix               = var.env_prefix
 }
 

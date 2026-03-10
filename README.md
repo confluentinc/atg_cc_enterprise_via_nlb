@@ -27,9 +27,20 @@ Thus we end up with an NLB on the public internet which forwards traffic (on por
 
 The purpose of the VM is to make it possible to test Kafka connectivity to the cluster via the private link. It's accessible via ssh. 
 
-Any clients accessing the public endpoint need to resolve both the bootstrap FQDN (which has the form `<lkc_id>.<region>.<csp>.private.confluent.cloud`) and all the broker FQDNs (of the form <lkc_id>_<broker_hex>.<region>.<csp>.private.confluent.cloud`)) to the public IP address of the NLB. This requires a wildcard mapping in the DNS, which can be accomplished in dnsmasq with an entry like
+Any clients accessing the public endpoint need to resolve both the bootstrap FQDN and all the broker FQDNs to the public IP address of the NLB.
+
+**For PLATT mode:** FQDNs have the form `<lkc_id>.<region>.<csp>.private.confluent.cloud` and `<lkc_id>_<broker_hex>.<region>.<csp>.private.confluent.cloud`
+
+**For Gateway mode:** FQDNs have the form `<lkc_id>.<region>.<csp>.egress.glb.confluent.cloud` and `<lkc_id>_<broker_hex>.<region>.<csp>.egress.glb.confluent.cloud`
+
+This requires a wildcard mapping in the DNS. For PLATT mode, this can be accomplished in dnsmasq with an entry like:
 ```
 address=/eu-west-1.aws.private.confluent.cloud/34.242.88.53
+```
+
+For Gateway mode:
+```
+address=/eu-west-1.aws.egress.glb.confluent.cloud/34.242.88.53
 ```
 
 NB! this is just a proof-of-concept, so it only uses a single AZ with a single Private Link endpoint. This is a single point of failure. For production use it would need to be extended to use at least 2 of the possible 3 PL endpoints to connect to the Confluent Cloud Network that the cluster is in. The ingress security groups on the NLB and jumphost should also be tightened up as much as possible.
@@ -51,7 +62,24 @@ export CONFLUENT_CLOUD_API_KEY="<cloud_api_key>"
 export CONFLUENT_CLOUD_API_SECRET="<cloud_api_secret>"
 export TF_VAR_owner=<email address to tag AWS resources>
 export TF_VAR_region=<AWS region to use, defaults to eu-west-1/Ireland>
+export TF_VAR_privatelink_mode=<platt or gateway, defaults to platt>
 ```
+
+### PrivateLink Architecture Modes
+
+This setup supports two PrivateLink architectures:
+
+**1. Private Link Attachment (PLATT) Mode** (default)
+- Uses `confluent_private_link_attachment` and `confluent_private_link_attachment_connection`
+- DNS domain format: `<network_id>.<region>.<cloud>.private.confluent.cloud`
+- Set `TF_VAR_privatelink_mode=platt` (or omit for default)
+
+**2. Gateway + Access Point Mode**
+- Uses `confluent_network`, `confluent_gateway`, and `confluent_private_link_access_point`
+- DNS domain format: `<gateway_id>.<region>.<cloud>.egress.glb.confluent.cloud`
+- Set `TF_VAR_privatelink_mode=gateway`
+
+The setup automatically configures DNS routing based on the selected mode.
 
 And then use Terraform to create the various AWS resources and create the Confluent Cloud Environment and Cluster.
 ```shell
@@ -69,7 +97,11 @@ terraform output endpoint_info
 
 If you can add an entry in your local `/etc/hosts` file (or DNS) so that the FQDN of the cluster endpoint points to the public IP address then when you re-run `terraform apply` the API key generation should succeed and the topic will be created.
 
-In order to be able to access the Kafka APIs (i.e. using a Kafka client) your DNS should resolve the wildcard `*.<region>.aws.private.confluent.cloud` to the public IP address of the NLB. Look at the `connection_info` output from Terraform to retrieve the newly create cluster API keys and some example commands for producing to and consuming from the topic using the [Confluent CLI tool](https://docs.confluent.io/confluent-cli/current/install.html).
+In order to be able to access the Kafka APIs (i.e. using a Kafka client) your DNS should resolve the appropriate wildcard to the public IP address of the NLB:
+- **PLATT mode:** `*.<region>.aws.private.confluent.cloud`
+- **Gateway mode:** `*.<region>.aws.egress.glb.confluent.cloud`
+
+Look at the `connection_info` output from Terraform to retrieve the newly created cluster API keys and some example commands for producing to and consuming from the topic using the [Confluent CLI tool](https://docs.confluent.io/confluent-cli/current/install.html).
 
 ```shell
 terraform output connection_info
