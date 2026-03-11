@@ -8,16 +8,6 @@ variable "owner" {
   type        = string
 }
 
-variable "confluent_cloud_api_key" {
-  description = "Confluent Cloud API Key (also referred as Cloud API ID)."
-  type        = string
-}
-
-variable "confluent_cloud_api_secret" {
-  description = "Confluent Cloud API Secret."
-  type        = string
-  sensitive   = true
-}
 variable "env_prefix" {
   description = "String to prefix names with"
   type        = string
@@ -32,4 +22,10 @@ variable "privatelink_mode" {
     condition     = contains(["platt", "gateway"], var.privatelink_mode)
     error_message = "privatelink_mode must be either 'platt' or 'gateway'."
   }
+}
+
+variable "enable_dataplane" {
+  description = "Enable dataplane module (API keys and topics). Set to true after initial apply when DNS is configured."
+  type        = bool
+  default     = false
 }

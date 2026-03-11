@@ -37,4 +37,5 @@ variable "private_subnets_cidr" {
 variable "pl_endpoints" {
   type = list (any)
   description = "List of ids for the PL endpoints"
+  default = []
 }

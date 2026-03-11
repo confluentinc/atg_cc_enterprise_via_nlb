@@ -7,10 +7,6 @@ variable "region" {
   description = "The region of the AWS peer VPC."
   type        = string
 }
-variable "vpc_endpoint_id" {
-  description = "The VPC where the PL endpoints live"
-  type        = string
-}
 
 variable "owner" {
   description = "The email address of the person creating the resources"

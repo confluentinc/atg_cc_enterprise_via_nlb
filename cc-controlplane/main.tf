@@ -2,7 +2,7 @@ terraform {
   required_providers {
     confluent = {
       source  = "confluentinc/confluent"
-      version = ">=2.20.0"
+      version = ">=2.50.0"
     }
   }
 }
@@ -23,14 +23,6 @@ resource "confluent_kafka_cluster" "enterprise" {
   environment {
     id = confluent_environment.pe_staging.id
   }
-
-  # Associate with network in gateway mode
-  dynamic "network" {
-    for_each = var.privatelink_mode == "gateway" ? [1] : []
-    content {
-      id = confluent_network.private_link[0].id
-    }
-  }
 }
 
 # PLATT mode resources
@@ -44,33 +36,10 @@ resource "confluent_private_link_attachment" "pla" {
   }
 }
 
-resource "confluent_private_link_attachment_connection" "plac" {
-  count        = var.privatelink_mode == "platt" ? 1 : 0
-  display_name = "staging-aws-plattc"
-  environment {
-    id = confluent_environment.pe_staging.id
-  }
-  aws {
-    vpc_endpoint_id = var.vpc_endpoint_id
-  }
-
-  private_link_attachment {
-    id = confluent_private_link_attachment.pla[0].id
-  }
-}
+# PLATT connection moved to main.tf to break circular dependency
+# Gateway access point also moved to main.tf to break circular dependency
 
 # Gateway mode resources
-resource "confluent_network" "private_link" {
-  count        = var.privatelink_mode == "gateway" ? 1 : 0
-  display_name = "${var.env_prefix}-private-link-network"
-  cloud        = "AWS"
-  region       = var.region
-  connection_types = ["PRIVATELINK"]
-  environment {
-    id = confluent_environment.pe_staging.id
-  }
-}
-
 resource "confluent_gateway" "main" {
   count        = var.privatelink_mode == "gateway" ? 1 : 0
   display_name = "${var.env_prefix}-gateway"
@@ -78,26 +47,8 @@ resource "confluent_gateway" "main" {
     id = confluent_environment.pe_staging.id
   }
 
-  aws_egress_private_link_gateway {
+  aws_ingress_private_link_gateway {
     region = var.region
-  }
-}
-
-resource "confluent_private_link_access_point" "aws" {
-  count        = var.privatelink_mode == "gateway" ? 1 : 0
-  display_name = "${var.env_prefix}-access-point"
-  environment {
-    id = confluent_environment.pe_staging.id
-  }
-  network {
-    id = confluent_network.private_link[0].id
-  }
-  gateway {
-    id = confluent_gateway.main[0].id
-  }
-
-  aws_private_link_access_point {
-    vpc_endpoint_id = var.vpc_endpoint_id
   }
 }
 

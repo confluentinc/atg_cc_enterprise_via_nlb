@@ -218,6 +218,7 @@ resource "aws_lb_target_group" "cc-rest-tg" {
 }
 
 resource "aws_lb_target_group_attachment" "cc-kakfa-to-pl"{
+  count            = length(var.pl_endpoints) > 0 ? 1 : 0
   target_group_arn = aws_lb_target_group.cc-kafka-tg.arn
   // user join() to deal with the "is set of string with 1 element" issue
   //target_id = join("", var.pl_endpoints[0].network_interface_ids)
@@ -225,6 +226,7 @@ resource "aws_lb_target_group_attachment" "cc-kakfa-to-pl"{
   port = 9092
 }
 resource "aws_lb_target_group_attachment" "cc-rest-to-pl"{
+  count            = length(var.pl_endpoints) > 0 ? 1 : 0
   target_group_arn = aws_lb_target_group.cc-rest-tg.arn
   // user join() to deal with the "is set of string with 1 element" issue
   //target_id = join("", var.pl_endpoints[0].network_interface_ids)

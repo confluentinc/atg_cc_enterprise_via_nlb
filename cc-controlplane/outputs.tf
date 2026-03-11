@@ -8,11 +8,12 @@ output "resource-ids" {
 }
 
 output "vpc_endpoint_service_name" {
-  value = var.privatelink_mode == "platt" ? confluent_private_link_attachment.pla[0].aws[0].vpc_endpoint_service_name : confluent_gateway.main[0].aws_egress_private_link_gateway[0].vpc_endpoint_service_name
+  value = var.privatelink_mode == "platt" ? confluent_private_link_attachment.pla[0].aws[0].vpc_endpoint_service_name : confluent_gateway.main[0].aws_ingress_private_link_gateway[0].vpc_endpoint_service_name
 }
 
 output "dns_domain" {
-  value = var.privatelink_mode == "platt" ? confluent_private_link_attachment.pla[0].dns_domain : confluent_gateway.main[0].aws_egress_private_link_gateway[0].dns_domain
+  value = var.privatelink_mode == "platt" ? confluent_private_link_attachment.pla[0].dns_domain : ""
+  description = "DNS domain for PLATT mode. For gateway mode, use confluent_access_point.gateway output from main.tf"
 }
 
 output "app-manager" {
@@ -28,16 +29,9 @@ output "app-producer" {
 output "enterprise_cluster" {
   value = confluent_kafka_cluster.enterprise
 }
-output "plac" {
-  value = var.privatelink_mode == "platt" ? confluent_private_link_attachment_connection.plac[0] : null
-}
 
-output "access_point" {
-  value = var.privatelink_mode == "gateway" ? confluent_private_link_access_point.aws[0] : null
-}
-
-output "network" {
-  value = var.privatelink_mode == "gateway" ? confluent_network.private_link[0] : null
+output "pla" {
+  value = var.privatelink_mode == "platt" ? confluent_private_link_attachment.pla[0] : null
 }
 
 output "gateway" {
