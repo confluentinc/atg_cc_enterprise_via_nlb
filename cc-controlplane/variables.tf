@@ -7,10 +7,6 @@ variable "region" {
   description = "The region of the AWS peer VPC."
   type        = string
 }
-variable "vpc_endpoint_id" {
-  description = "The VPC where the PL endpoints live"
-  type        = string
-}
 
 variable "owner" {
   description = "The email address of the person creating the resources"
@@ -19,5 +15,11 @@ variable "owner" {
 variable "env_prefix" {
   description = "String to prefix names with"
   type        = string
+}
+
+variable "privatelink_mode" {
+  description = "PrivateLink mode: 'platt' for Private Link Attachment or 'gateway' for Gateway + Access Point"
+  type        = string
+  default     = "gateway"
 }
 

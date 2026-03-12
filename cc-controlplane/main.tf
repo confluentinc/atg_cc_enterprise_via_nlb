@@ -2,7 +2,7 @@ terraform {
   required_providers {
     confluent = {
       source  = "confluentinc/confluent"
-      version = ">=2.20.0"
+      version = ">=2.50.0"
     }
   }
 }
@@ -25,26 +25,30 @@ resource "confluent_kafka_cluster" "enterprise" {
   }
 }
 
+# PLATT mode resources
 resource "confluent_private_link_attachment" "pla" {
-  cloud = "AWS"
-  region = var.region
+  count        = var.privatelink_mode == "platt" ? 1 : 0
+  cloud        = "AWS"
+  region       = var.region
   display_name = "staging-aws-platt"
   environment {
     id = confluent_environment.pe_staging.id
   }
 }
 
-resource "confluent_private_link_attachment_connection" "plac" {
-  display_name = "staging-aws-plattc"
+# PLATT connection moved to main.tf to break circular dependency
+# Gateway access point also moved to main.tf to break circular dependency
+
+# Gateway mode resources
+resource "confluent_gateway" "main" {
+  count        = var.privatelink_mode == "gateway" ? 1 : 0
+  display_name = "${var.env_prefix}-gateway"
   environment {
     id = confluent_environment.pe_staging.id
   }
-  aws {
-    vpc_endpoint_id = var.vpc_endpoint_id
-  }
 
-  private_link_attachment {
-    id = confluent_private_link_attachment.pla.id
+  aws_ingress_private_link_gateway {
+    region = var.region
   }
 }
 

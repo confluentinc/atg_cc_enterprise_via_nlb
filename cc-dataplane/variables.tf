@@ -24,7 +24,13 @@ variable "app-manager-is-cluster-admin" {
   description = "The app manager role binding to as cluster admin"
 }
 variable "plac" {
-  description = "The private network connection is ready"
+  description = "The private link attachment connection (PLATT mode)"
+  default     = null
+}
+
+variable "access_point" {
+  description = "The private link access point (Gateway mode)"
+  default     = null
 }
 variable "kafka-cluster" {
   description = "The Kakfa Cluster resource"
